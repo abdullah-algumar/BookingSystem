@@ -1,0 +1,40 @@
+version: '3.3'
+
+services:
+  db:
+    restart: always
+    container_name: django_db
+    image: postgres
+    env_file:
+      - .env
+    volumes:
+      - /home/postgres_db:/var/lib/postgresql/data:rw
+  rest:
+    restart: always
+    container_name: django_drf
+    image: django
+    build:
+      context: ./core/
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - /home/api:/home/abdullah
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  
+  frontend:
+    restart: always
+    command : npm start
+    container_name: frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    depends_on:
+      - rest
+  
